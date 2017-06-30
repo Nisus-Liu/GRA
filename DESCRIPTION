@@ -1,0 +1,18 @@
+Package: GRA
+Title: Grey Relational Analysis(GRA)
+Version: 1.0.0
+Authors@R: person("Nisus", "Liu", email = "liuhejunlj@163.com", role = c("aut", "cre"))
+Description: first function: grey relational degree, which is similar to
+    orrelation coefficient, if you want to evaluate some unit, please transpose
+    data frame before using this function. second funtion: grey clustering, like
+    hierarchical clustering, see \code{hclust}.
+Depends:
+    R (>= 3.2.5)
+License: GPL-2
+Encoding: UTF-8
+LazyData: true
+Suggests:
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+RoxygenNote: 5.0.1

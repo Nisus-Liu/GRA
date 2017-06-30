@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Nisus Liu" />
+
+<meta name="date" content="2017-06-30" />
+
+<title>Grey Relational Analysis(GRA)</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Grey Relational Analysis(GRA)</h1>
+<h4 class="author"><em>Nisus Liu</em></h4>
+<h4 class="date"><em>2017-06-30</em></h4>
+
+
+
+<p>Grey Relational Analysis include two important function. First function: grey relational degree, which is similar to orrelation coefficient, if you want to evaluate some units, please transpose data frame before using this function. Second funtion: grey clustering, like hierarchical clustering, see <code>hclust</code>.</p>
+<div id="grey-relational-degree" class="section level2">
+<h2>Grey Relational Degree</h2>
+<p>There are two usage of grey relational degree. This algorithm is to measure similarity of two variables, just like <code>cor</code>. You can transpose your data set if you want to evaluate some units.</p>
+<ul>
+<li>One is to inspect correlation of two variables, data type like:</li>
+</ul>
+<table>
+<thead>
+<tr class="header">
+<th align="left">reference</th>
+<th align="left">v1</th>
+<th align="left">v2</th>
+<th align="left">v3</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1.2</td>
+<td align="left">1.8</td>
+<td align="left">0.9</td>
+<td align="left">8.4</td>
+</tr>
+<tr class="even">
+<td align="left">0.11</td>
+<td align="left">0.3</td>
+<td align="left">0.5</td>
+<td align="left">0.2</td>
+</tr>
+<tr class="odd">
+<td align="left">1.3</td>
+<td align="left">0.7</td>
+<td align="left">0.12</td>
+<td align="left">0.98</td>
+</tr>
+<tr class="even">
+<td align="left">1.9</td>
+<td align="left">1.09</td>
+<td align="left">2.8</td>
+<td align="left">0.99</td>
+</tr>
+</tbody>
+</table>
+<p><code>reference</code>: reference variable, grey relational degree between <code>reference</code> and <code>v1</code>… approximately measures the similarity of <code>reference</code> and <code>v1</code>.</p>
+<ul>
+<li>Another is to evaluate good or bad about some units.</li>
+</ul>
+<table>
+<thead>
+<tr class="header">
+<th align="left">units</th>
+<th align="left">v1</th>
+<th align="left">v2</th>
+<th align="left">v3</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">jiangsu</td>
+<td align="left">1.8</td>
+<td align="left">0.9</td>
+<td align="left">8.4</td>
+</tr>
+<tr class="even">
+<td align="left">zhejiang</td>
+<td align="left">0.3</td>
+<td align="left">0.5</td>
+<td align="left">0.2</td>
+</tr>
+<tr class="odd">
+<td align="left">anhui</td>
+<td align="left">0.7</td>
+<td align="left">0.12</td>
+<td align="left">0.98</td>
+</tr>
+<tr class="even">
+<td align="left">fujian</td>
+<td align="left">1.09</td>
+<td align="left">2.8</td>
+<td align="left">0.99</td>
+</tr>
+</tbody>
+</table>
+<div id="example" class="section level3">
+<h3>Example</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## generate data
+refer =<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">1</span>)
+liaoning =<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.064</span>, <span class="fl">0.082</span>,<span class="fl">0.978</span>,<span class="fl">0.423</span>)
+shandong =<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.101</span>,<span class="fl">0.3</span>,<span class="dv">1</span>,<span class="fl">0.917</span>)
+jiangsu =<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.114</span>,<span class="fl">0.14</span>,<span class="fl">0.943</span>, <span class="fl">0.315</span>)
+zhejiang =<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.102</span>,<span class="fl">0.147</span>,<span class="fl">0.934</span>,<span class="fl">0.395</span>)
+fujian =<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.022</span>,<span class="fl">0.053</span>,<span class="fl">0.927</span>,<span class="fl">0.061</span>)
+guangdong =<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="fl">0.012</span>,<span class="dv">1</span>)
+economyCompare =<span class="st"> </span><span class="kw">data.frame</span>(refer, liaoning, shandong, jiangsu, zhejiang, fujian, guangdong)
+<span class="kw">rownames</span>(economyCompare) =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;indGV&quot;</span>, <span class="st">&quot;indVA&quot;</span>, <span class="st">&quot;profit&quot;</span>, <span class="st">&quot;incomeTax&quot;</span>)
+
+## Grey Relational Degree
+greyRelDegree =<span class="st"> </span><span class="kw">GRA</span>(economyCompare)
+greyRelDegree</code></pre></div>
+<pre><code>## $relationalDegree
+## refer~guangdong  refer~shandong  refer~liaoning  refer~zhejiang 
+##       0.8333333       0.6561295       0.5284821       0.5133171 
+##   refer~jiangsu    refer~fujian 
+##       0.5095917       0.4735997 
+## 
+## $X
+##           guangdong shandong liaoning zhejiang jiangsu fujian
+## indGV         1.000    0.101    0.064    0.102   0.114  0.022
+## indVA         1.000    0.300    0.082    0.147   0.140  0.053
+## profit        0.012    1.000    0.978    0.934   0.943  0.927
+## incomeTax     1.000    0.917    0.423    0.395   0.315  0.061
+## 
+## $referColumn
+##           refer
+## indGV         1
+## indVA         1
+## profit        1
+## incomeTax     1</code></pre>
+</div>
+</div>
+<div id="grey-clustering" class="section level2">
+<h2>Grey Clustering</h2>
+<div id="example-1" class="section level3">
+<h3>Example</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## Grey Clustering
+<span class="kw">GRA</span>(economyCompare, <span class="dt">cluster =</span> T)</code></pre></div>
+<p><img src="data:image/png;base64,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" alt /><!-- --></p>
+<pre><code>## $relationalDegree
+## refer~guangdong  refer~shandong  refer~liaoning  refer~zhejiang 
+##       0.8333333       0.6561295       0.5284821       0.5133171 
+##   refer~jiangsu    refer~fujian 
+##       0.5095917       0.4735997 
+## 
+## $greyCorrelCoeff
+##           guangdong  shandong  liaoning  zhejiang   jiangsu    fujian
+## guangdong 1.0000000 0.5947807 0.2086785 0.1542963 0.1405808 0.0000000
+## shandong  0.5947807 1.0000000 0.6339301 0.5837378 0.5711273 0.4429387
+## liaoning  0.2086785 0.6339301 1.0000000 0.9511115 0.9388759 0.8155451
+## zhejiang  0.1542963 0.5837378 0.9511115 1.0000000 0.9877708 0.8646495
+## jiangsu   0.1405808 0.5711273 0.9388759 0.9877708 1.0000000 0.8769148
+## fujian    0.0000000 0.4429387 0.8155451 0.8646495 0.8769148 1.0000000
+## 
+## $X
+##           guangdong shandong liaoning zhejiang jiangsu fujian
+## indGV         1.000    0.101    0.064    0.102   0.114  0.022
+## indVA         1.000    0.300    0.082    0.147   0.140  0.053
+## profit        0.012    1.000    0.978    0.934   0.943  0.927
+## incomeTax     1.000    0.917    0.423    0.395   0.315  0.061
+## 
+## $referColumn
+##           refer
+## indGV         1
+## indVA         1
+## profit        1
+## incomeTax     1</code></pre>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

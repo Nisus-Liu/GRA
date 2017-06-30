@@ -1,0 +1,147 @@
+
+#' @title Grey Relational Analysis(GRA)
+#' @description first function: grey relational degree, which is similar to orrelation coefficient, if you want to evaluate some unit, please transpose data frame before using this function.
+#' second funtion: grey clustering, like hierarchical clustering, see \code{hclust}.
+#' @param df a data frame with standardized data which can aviod the effects of dimensions. Note: it must
+#' includes reference sequence.
+#' @param referColNum the number of reference sequence in \code{df}.
+#' @param distingCoeff distinguishing coefficient, the smaller the higher distinguish.
+#' @param cluster logical value, indicates whether to cluster, default is \code{FALSE}. Note: this algorithm clusters by column(most clustering method are by row) because it is
+#' base on grey relational degree algorithm(mode like correlation coefficient, not evaluating mode).
+#' @param clusterMethod method of cluster.
+
+#' @examples
+
+#' ## generate data
+#' refer = c(1,1,1,1)
+#' liaoning = c(0.064, 0.082,0.978,0.423)
+#' shandong = c(0.101,0.3,1,0.917)
+#' jiangsu = c(0.114,0.14,0.943, 0.315)
+#' zhejiang = c(0.102,0.147,0.934,0.395)
+#' fujian = c(0.022,0.053,0.927,0.061)
+#' guangdong = c(1,1,0.012,1)
+#' economyCompare = data.frame(refer, liaoning, shandong, jiangsu, zhejiang, fujian, guangdong)
+#' rownames(economyCompare) = c("indGV", "indVA", "profit", "incomeTax")
+
+#' ## Grey Relational Degree
+#' greyRelDegree = GRA(economyCompare)
+#' greyRelDegree
+
+#' ## Grey Clustering
+#' GRA(economyCompare, cluster = T)
+
+
+GRA = function(df, referColNum = 1, distingCoeff = 0.5, cluster = FALSE, clusterMethod = "single")  {
+  
+  # 异常控制 #
+  if (any(is.na(df))) stop("'df' have NA" )
+  if (distingCoeff<0 | distingCoeff>1) stop("'distingCoeff' must be in range of [0,1]" )
+  if (referColNum<0 | referColNum>ncol(df)) stop("'referColNum' out of range")
+  
+  
+  y = df[referColNum]
+  nr = nrow(y)
+  X = df[-referColNum]
+  nc = ncol(X)
+  
+  
+  diff = X  #设置差学列矩阵空间
+  
+  for (i in 1:nc) {
+    diff[i] = abs(y-X[i])
+  }
+  
+  mi = min(diff)
+  mx = max(diff)
+  
+  
+  #计算关联系数#
+  relations = (mi+distingCoeff*mx) / (diff + distingCoeff*mx)
+  
+  #计算关联度#
+  # 暂时简单处理, 等权
+  relDegree = rep(NA, nc)
+  for (i in 1:nc) {
+    relDegree[i] = mean(relations[,i])  # 等权
+  }
+  
+  
+  #排序: 按关联度大到小#
+  X_order = X[order(relDegree, decreasing = TRUE)]
+  relationalDegree = relDegree[order(relDegree, decreasing = TRUE)]
+  relDes = rep(NA, nc) #分配空间  关联关系描述(说明谁和谁的关联度)
+  X_names = names(X_order)
+  for (i in 1:nc) {
+    relDes[i] = paste(names(df)[referColNum], X_names[i], sep = "~")
+  }
+  names(relationalDegree) = relDes
+  
+  # greyRelDegree = list(relationalDegree = relationalDegree, X_order = X_order)
+  
+  
+  if (cluster) {
+    
+    greyRelDegree = GRA(economyCompare, referColNum = 1, distingCoeff = 0.5)
+    
+    
+    # relationalDegree = greyRelDegree$relationalDegree
+    # X = X_order
+    
+    
+    
+    nc = length(relationalDegree)
+    
+    # 得到差异率矩阵 #
+    grey_diff = matrix(0, nrow = nc, ncol = nc)
+    for (i in 1:nc) {
+      for(j in 1:nc)  {
+        
+        grey_diff[i,j] = abs(relationalDegree[i] - relationalDegree[j]) / relationalDegree[j]
+      }
+    }
+    #得到距离矩阵#
+    grey_dist = matrix(0, nrow = nc, ncol = nc)
+    for (i in 1:nc) {
+      for (j in 1:nc) {
+        grey_dist[i,j] = grey_diff[i,j]+grey_diff[j,i]
+      }
+    }
+    
+    # 得到灰色相关系数矩阵 #
+    grey_dist_max = max(grey_dist)
+    grey_correl = matrix(0, nrow = nc, ncol = nc)
+    for (i in 1:nc) {
+      for (j in 1:nc) {
+        grey_correl[i,j] = 1 - grey_dist[i,j] / grey_dist_max
+      }
+    }
+    
+    rownames(grey_correl) = names(X_order)
+    colnames(grey_correl) = names(X_order)
+    grey_correl
+    
+    
+    d = as.dist(1-grey_correl)  # 得到无对角线的下三角矩阵(数值意义反向了, 值越小表示越相关 )
+    # 主对角线其实表示了各个对象的相近程度, 画图的时候, 相近的对象放在一起
+    
+    hc = hclust(d, method = clusterMethod)  # 系统聚类(分层聚类)函数, single: 单一连接(最短距离法/最近邻) 
+    # hc$height, 是上面矩阵的对角元素升序
+    # hc$order, 层次树图上横轴个体序号
+    plot(hc,hang=-1)  #hang: 设置标签悬挂位置
+    
+  }
+  
+  #output#
+  
+  if (cluster)  {
+    lst = list(relationalDegree=relationalDegree, greyCorrelCoeff = grey_correl, X = X_order, referColumn = y)
+    
+  }
+  else {
+    lst = list(relationalDegree=relationalDegree, X = X_order, referColumn = y)
+  }
+  
+  return(lst)
+  
+}
+
